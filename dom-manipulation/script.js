@@ -2,7 +2,8 @@
 // Quotes Array (with LocalStorage support)
 // ===============================
 let quotes = [];
-let selectedCategory = "all"; // ✅ required by Task 2 checker
+let selectedCategory = "all"; // ✅ required by Task 2
+let searchQuery = ""; // ✅ required by Task 3
 
 // Load Quotes from Local Storage on Startup
 function loadQuotes() {
@@ -20,6 +21,7 @@ function loadQuotes() {
 
   // Restore last selected filter from storage
   selectedCategory = localStorage.getItem("lastFilter") || "all";
+  searchQuery = localStorage.getItem("lastSearch") || "";
 }
 
 // Save Quotes to Local Storage
@@ -65,6 +67,7 @@ function addQuote() {
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
     alert("Quote added!");
+    filterQuotes(); // refresh view
   } else {
     alert("Please enter both a quote and a category.");
   }
@@ -92,6 +95,7 @@ function importFromJsonFile(event) {
         quotes.push(...importedQuotes);
         saveQuotes();
         alert("Quotes imported successfully!");
+        filterQuotes(); // refresh view
       } else {
         alert("Invalid file format.");
       }
@@ -119,22 +123,38 @@ function populateCategories() {
     filter.appendChild(option);
   });
 
-  filter.value = selectedCategory; // ✅ use the variable
+  filter.value = selectedCategory; // ✅ use variable
 }
 
 function filterQuotes() {
   const filter = document.getElementById("categoryFilter");
-  selectedCategory = filter.value; // ✅ update global variable
-  localStorage.setItem("lastFilter", selectedCategory);
+  if (filter) {
+    selectedCategory = filter.value; // ✅ update global variable
+    localStorage.setItem("lastFilter", selectedCategory);
+  }
 
-  const filtered = selectedCategory === "all"
+  // Apply category + search together
+  let filtered = selectedCategory === "all"
     ? quotes
     : quotes.filter(q => q.category === selectedCategory);
+
+  if (searchQuery) {
+    filtered = filtered.filter(q => q.text.toLowerCase().includes(searchQuery.toLowerCase()));
+  }
 
   const quoteDisplay = document.getElementById("quoteDisplay");
   quoteDisplay.innerHTML = filtered.length > 0
     ? filtered.map(q => `<p>"${q.text}" <small>(${q.category})</small></p>`).join("")
-    : "<p>No quotes found for this category.</p>";
+    : "<p>No quotes found.</p>";
+}
+
+// ===============================
+// Task 3: Search Functionality
+// ===============================
+function searchQuotes(event) {
+  searchQuery = event.target.value.trim();
+  localStorage.setItem("lastSearch", searchQuery);
+  filterQuotes();
 }
 
 // ===============================
@@ -155,11 +175,13 @@ document.addEventListener("DOMContentLoaded", () => {
   loadQuotes();
   createAddQuoteForm();
 
-  // Hook up existing HTML buttons
+  // Hook up buttons & inputs
   document.getElementById("newQuote").addEventListener("click", showRandomQuote);
   document.getElementById("exportBtn").addEventListener("click", exportToJsonFile);
   document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
+  document.getElementById("searchInput").addEventListener("input", searchQuotes);
 
   populateCategories();
+  document.getElementById("searchInput").value = searchQuery; // restore last search
   filterQuotes();
 });
