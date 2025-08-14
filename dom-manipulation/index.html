@@ -7,18 +7,14 @@
 </head>
 <body>
   <h1>Dynamic Quote Generator</h1>
-
-  <div id="quoteDisplay">Click "Show New Quote" to start!</div>
+  
+  <div id="quoteDisplay"></div>
   <button id="newQuote">Show New Quote</button>
 
-  <h3>Add New Quote</h3>
+  <h3>Add a New Quote</h3>
   <input id="newQuoteText" type="text" placeholder="Enter a new quote">
   <input id="newQuoteCategory" type="text" placeholder="Enter quote category">
-  <button id="addQuoteBtn">Add Quote</button>
-
-  <h3>Import/Export Quotes</h3>
-  <button id="exportBtn">Export Quotes to JSON</button>
-  <input type="file" id="importFile" accept=".json">
+  <button onclick="addQuote()">Add Quote</button>
 
   <script src="script.js"></script>
 </body>
