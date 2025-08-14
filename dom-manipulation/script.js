@@ -6,7 +6,7 @@ let quotes = [
 ];
 
 // Display a random quote
-function displayRandomQuote() {
+function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
 
@@ -17,7 +17,7 @@ function displayRandomQuote() {
     quoteDisplay.removeChild(quoteDisplay.firstChild);
   }
 
-  // Create a text node for the quote
+  // Create a text node and append
   const textNode = document.createTextNode(`"${quote.text}" — ${quote.category}`);
   quoteDisplay.appendChild(textNode);
 }
@@ -41,5 +41,5 @@ function addQuote() {
 }
 
 // Event listeners
-document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
+document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
