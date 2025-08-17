@@ -2,114 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dynamic Quote Generator — Server Sync Demo</title>
+  <title>Dynamic Quote Generator</title>
   <style>
-    :root {
-      --bg: #0f172a; /* slate-900 */
-      --panel: #111827; /* gray-900 */
-      --muted: #94a3b8; /* slate-400 */
-      --text: #e5e7eb; /* gray-200 */
-      --accent: #22d3ee; /* cyan-400 */
-      --accent-2: #a78bfa; /* violet-400 */
-      --danger: #fb7185; /* rose-400 */
-      --ok: #34d399; /* emerald-400 */
-      --warning: #fbbf24; /* amber-400 */
-      --card: #0b1220; /* deep panel */
-      --border: #1f2937; /* gray-800 */
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 10% 0%, #0b1220, #0f172a 60%);
-      color: var(--text);
-    }
-    header {
-      padding: 28px 20px; border-bottom: 1px solid var(--border); position: sticky; top:0; backdrop-filter: blur(6px);
-      background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(15,23,42,0.65));
-    }
-    h1 { margin: 0; font-size: clamp(22px, 3vw, 28px); letter-spacing: 0.3px; }
-    .container { max-width: 960px; margin: 18px auto; padding: 0 16px 36px; }
-    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
-    @media (min-width: 900px){ .grid { grid-template-columns: 1.3fr 1fr; } }
-
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-    .row { display:flex; gap:10px; flex-wrap: wrap; align-items: center; }
-    select, input[type="text"], button, input[type="file"]{
-      background: #0f172a; color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; outline: none; font: inherit;
-    }
-    button { cursor: pointer; border-color: #334155; }
-    button.primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #0b1220; font-weight: 700; }
-    button.warning { background: var(--warning); color: #111; border: none; font-weight: 700; }
-    button.ghost { background: transparent; }
-    small.muted { color: var(--muted); }
-    .quote { padding: 12px; border: 1px dashed #334155; border-radius: 12px; margin: 6px 0; line-height: 1.35; background: #0c1323; }
-    .category { font-size: 12px; color: var(--muted); }
-
-    /* Sync banner */
-    #syncBanner { display:none; align-items:center; gap:10px; padding: 10px 14px; border-radius: 12px; border:1px solid var(--border); background: #0b1324; margin: 8px 0 0; }
-    #syncBanner.ok { border-color: #064e3b; background: #052e2b; }
-    #syncBanner.warn { border-color: #473406; background: #261e05; }
-
-    details.conflicts summary { cursor: pointer; }
-    .conflict-item { border:1px solid #374151; border-radius: 12px; padding: 12px; margin: 8px 0; background: #0c1220; }
-    .conflict-actions { display:flex; gap:10px; margin-top: 8px; }
+    body { font-family: sans-serif; padding: 20px; }
+    .quote { margin: 10px 0; font-size: 1.1em; }
+    .category { font-size: 0.9em; color: #666; }
+    #syncBanner { display:none; padding:8px; margin-bottom:10px; border-radius:5px; }
+    #syncBanner.ok { background:#d7f9d7; color:#065f08; }
+    #syncBanner.warn { background:#ffe7d7; color:#8a3a00; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Dynamic Quote Generator — <span style="color:var(--accent)">Sync & Conflict Resolution</span></h1>
-    <div id="syncBanner" class="row" aria-live="polite"></div>
-  </header>
+  <h1>Dynamic Quote Generator</h1>
 
-  <div class="container">
-    <div class="grid">
-      <section class="card" aria-labelledby="controls-h">
-        <h2 id="controls-h" style="margin-top:6px">Controls</h2>
-        <div class="row">
-          <button id="newQuote" class="primary">Show Random Quote</button>
-          <button id="exportBtn">Export Quotes</button>
-          <label class="row" style="gap:6px">
-            <input type="file" id="importFile" accept=".json" />
-            <small class="muted">Import JSON</small>
-          </label>
-        </div>
-        <hr style="border-color:var(--border); margin: 12px 0;"/>
-        <div class="row">
-          <label>
-            <small class="muted">Search</small><br/>
-            <input id="searchInput" type="text" placeholder="Type to search quotes..." />
-          </label>
-          <label>
-            <small class="muted">Filter by Category</small><br/>
-            <select id="categoryFilter"></select>
-          </label>
-          <button id="syncNow" class="ghost" title="Force sync with server">Sync Now</button>
-        </div>
-      </section>
+  <div id="syncBanner"></div>
 
-      <section class="card" aria-labelledby="add-h">
-        <h2 id="add-h" style="margin-top:6px">Add a New Quote</h2>
-        <div class="row">
-          <input id="newQuoteText" type="text" placeholder="Enter a new quote" style="flex:2;" />
-          <input id="newQuoteCategory" type="text" placeholder="Enter quote category" style="flex:1;" />
-          <button id="addBtn" class="primary">Add Quote</button>
-        </div>
-        <small class="muted">New items are marked as <b>local</b> until synced.</small>
-      </section>
-    </div>
-
-    <section class="card" aria-labelledby="list-h">
-      <h2 id="list-h" style="margin-top:6px">Quotes</h2>
-      <div id="quoteDisplay"></div>
-      <p id="counts" class="category"></p>
-
-      <details id="conflictsPanel" class="conflicts" style="margin-top:12px">
-        <summary>Review Conflicts <small class="muted">(server won automatically, you can override)</small></summary>
-        <div id="conflictList"></div>
-      </details>
-    </section>
+  <div>
+    <select id="categoryFilter"></select>
+    <input type="text" id="searchInput" placeholder="Search quotes...">
+    <button id="newQuote">Random Quote</button>
+    <button id="syncNow">Sync Now</button>
+    <button id="exportBtn">Export</button>
+    <input type="file" id="importFile" accept="application/json">
   </div>
-  <script src="script.js"></script>
+
+  <div id="quoteDisplay"></div>
+  <p id="counts"></p>
+
+  <h3>Add a Quote</h3>
+  <input id="newQuoteText" placeholder="Quote text">
+  <input id="newQuoteCategory" placeholder="Category">
+  <button id="addBtn">Add</button>
+
+  <h3>Conflicts</h3>
+  <div id="conflictList"></div>
+
+  <script>
+    // paste your big JS block here (the one your checker flagged)
+  </script>
 </body>
 </html>
