@@ -1,44 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Quote Generator</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    .quote { margin: 10px 0; font-size: 1.1em; }
-    .category { font-size: 0.9em; color: #666; }
-    #syncBanner { display:none; padding:8px; margin-bottom:10px; border-radius:5px; }
-    #syncBanner.ok { background:#d7f9d7; color:#065f08; }
-    #syncBanner.warn { background:#ffe7d7; color:#8a3a00; }
-  </style>
 </head>
 <body>
   <h1>Dynamic Quote Generator</h1>
 
-  <div id="syncBanner"></div>
-
-  <div>
-    <select id="categoryFilter"></select>
-    <input type="text" id="searchInput" placeholder="Search quotes...">
-    <button id="newQuote">Random Quote</button>
-    <button id="syncNow">Sync Now</button>
-    <button id="exportBtn">Export</button>
-    <input type="file" id="importFile" accept="application/json">
-  </div>
-
+  <!-- Quote Display -->
   <div id="quoteDisplay"></div>
-  <p id="counts"></p>
+  <button id="newQuote">Show New Quote</button>
 
-  <h3>Add a Quote</h3>
-  <input id="newQuoteText" placeholder="Quote text">
-  <input id="newQuoteCategory" placeholder="Category">
-  <button id="addBtn">Add</button>
+  <!-- Category Filter -->
+  <h3>Filter by Category</h3>
+  <select id="categoryFilter" onchange="filterQuotes()">
+    <option value="all">All Categories</option>
+    <!-- Categories will be added dynamically -->
+  </select>
 
-  <h3>Conflicts</h3>
-  <div id="conflictList"></div>
+  <!-- Static Add Form (from Task 0 instructions) -->
+  <h3>Add a New Quote</h3>
+  <input id="newQuoteText" type="text" placeholder="Enter a new quote">
+  <input id="newQuoteCategory" type="text" placeholder="Enter quote category">
+  <button onclick="addQuote()">Add Quote</button>
 
-  <script>
-    // paste your big JS block here (the one your checker flagged)
-  </script>
+  <!-- Required for Task 1 -->
+  <br><br>
+  <button id="exportBtn">Export Quotes</button>
+  <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)">
+
+  <script src="script.js"></script>
 </body>
 </html>
